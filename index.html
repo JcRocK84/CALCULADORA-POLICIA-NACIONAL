@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Notas - Academia Ángeles Custodios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --police-blue: #001d3d;
+            --police-blue-light: #003566;
+            --police-yellow: #ffc300;
+            --police-yellow-dark: #ffd60a;
+        }
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .bg-police { background-color: var(--police-blue); }
+        .text-police { color: var(--police-blue); }
+        .border-police { border-color: var(--police-blue); }
+        .bg-yellow-police { background-color: var(--police-yellow); }
+        .btn-police {
+            background-color: var(--police-blue);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-police:hover {
+            background-color: var(--police-blue-light);
+            transform: translateY(-1px);
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .input-field {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 12px;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .input-field:focus {
+            border-color: var(--police-blue-light);
+        }
+    </style>
+</head>
+<body class="pb-12">
+
+    <!-- Header / Logo -->
+    <header class="bg-police text-white py-6 shadow-lg mb-8">
+        <div class="container mx-auto px-4 flex flex-col items-center">
+            <!-- Logo de la Academia Ángeles Custodios -->
+            <div class="mb-4 bg-white p-3 rounded-xl shadow-inner">
+                <img id="academy-logo" src="https://cursos.academiaangelescustodios.es/assets/img/logo.png" alt="Academia Ángeles Custodios" class="h-20 w-auto object-contain" onerror="this.src='https://www.policia.es/img/logo_cnp_header.png'">
+            </div>
+            <h1 class="text-2xl md:text-3xl font-bold text-center">Calculadora de Notas <span class="text-yellow-400">EB</span></h1>
+            <p class="text-sm opacity-80 uppercase tracking-widest mt-1">Escala Básica - Policía Nacional</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 max-w-4xl">
+        
+        <!-- Datos del Alumno -->
+        <section class="card p-6 mb-6 border-l-4 border-yellow-500">
+            <div class="flex items-center mb-4 text-police border-b pb-2">
+                <i class="fas fa-user-graduate mr-2 text-xl"></i>
+                <h2 class="text-xl font-bold uppercase">Datos del Opositor</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre Completo</label>
+                    <input type="text" id="studentName" placeholder="Ej: Juan Pérez" class="input-field">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">DNI / Identificador</label>
+                    <input type="text" id="studentId" placeholder="12345678X" class="input-field">
+                </div>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Conocimientos -->
+            <section class="card p-6 border-t-4 border-police">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center text-police">
+                        <i class="fas fa-book mr-2 text-xl"></i>
+                        <h2 class="text-lg font-bold uppercase">Teoría</h2>
+                    </div>
+                    <span class="text-xs font-bold bg-blue-100 text-blue-800 px-2 py-1 rounded">CORTE: 7.00</span>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-600">Aciertos</label>
+                        <input type="number" id="theoryHits" value="0" min="0" max="100" class="input-field" oninput="calculateTheory()">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600">Errores (Penaliza 0.5)</label>
+                        <input type="number" id="theoryMisses" value="0" min="0" max="100" class="input-field" oninput="calculateTheory()">
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg flex justify-between items-center">
+                        <span class="font-bold text-police">Nota Final:</span>
+                        <div class="text-right">
+                            <span id="theoryResult" class="text-2xl font-black text-police">0.00</span>
+                            <div id="theoryBadge" class="text-[10px] font-bold uppercase mt-1"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Psicotécnicos -->
+            <section class="card p-6 border-t-4 border-yellow-500">
+                <div class="flex items-center mb-4 text-police">
+                    <i class="fas fa-brain mr-2 text-xl"></i>
+                    <h2 class="text-lg font-bold uppercase">Psicotécnicos</h2>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-600">Aciertos</label>
+                        <input type="number" id="psyHits" value="0" min="0" class="input-field" oninput="calculatePsy()">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600">Errores</label>
+                        <input type="number" id="psyMisses" value="0" min="0" class="input-field" oninput="calculatePsy()">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600">Opciones de respuesta (n)</label>
+                        <select id="psyOptions" class="input-field" onchange="calculatePsy()">
+                            <option value="3">3 opciones (Penaliza 0.5)</option>
+                            <option value="4">4 opciones (Penaliza 0.33)</option>
+                            <option value="2">2 opciones (Penaliza 1.0)</option>
+                        </select>
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-lg flex justify-between items-center">
+                        <span class="font-bold text-yellow-800">Puntos Netos:</span>
+                        <span id="psyResult" class="text-2xl font-black text-yellow-800">0.00</span>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Pruebas Físicas -->
+        <section class="card p-6 mt-6 border-t-4 border-police">
+            <div class="flex items-center justify-between mb-4 border-b pb-2">
+                <div class="flex items-center text-police">
+                    <i class="fas fa-running mr-2 text-xl"></i>
+                    <h2 class="text-xl font-bold uppercase">Pruebas Físicas</h2>
+                </div>
+                <span class="text-xs font-bold bg-yellow-100 text-yellow-800 px-2 py-1 rounded">MÍNIMO: 15 PUNTOS</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <label class="block font-semibold mb-2">Circuito Agilidad</label>
+                    <input type="number" id="phys1" placeholder="0-10" min="0" max="10" class="input-field text-center font-bold text-lg" oninput="calculatePhys()">
+                    <p class="text-[10px] text-gray-400 mt-1">Puntos</p>
+                </div>
+                <div class="text-center">
+                    <label class="block font-semibold mb-2">Dominadas / Barra</label>
+                    <input type="number" id="phys2" placeholder="0-10" min="0" max="10" class="input-field text-center font-bold text-lg" oninput="calculatePhys()">
+                    <p class="text-[10px] text-gray-400 mt-1">Puntos</p>
+                </div>
+                <div class="text-center">
+                    <label class="block font-semibold mb-2">Carrera 1.000m</label>
+                    <input type="number" id="phys3" placeholder="0-10" min="0" max="10" class="input-field text-center font-bold text-lg" oninput="calculatePhys()">
+                    <p class="text-[10px] text-gray-400 mt-1">Puntos</p>
+                </div>
+            </div>
+            <div class="mt-6 bg-gray-100 p-4 rounded-lg flex justify-between items-center">
+                <div>
+                    <span class="font-bold text-gray-700 uppercase tracking-wide">Puntuación Total:</span>
+                    <p class="text-[10px] text-gray-500">*No se permite un 0 en ninguna prueba</p>
+                </div>
+                <div class="text-right">
+                    <span id="physTotal" class="text-3xl font-black text-police">0</span>
+                    <span class="text-gray-400 font-bold">/ 30</span>
+                    <div id="physBadge" class="text-[10px] font-bold uppercase mt-1"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resultado Final y Botones -->
+        <div class="mt-8 text-center space-y-4">
+            <button onclick="generateReport()" class="btn-police px-8 py-4 rounded-full font-bold text-lg shadow-xl uppercase tracking-widest w-full md:w-auto">
+                <i class="fas fa-file-invoice mr-2"></i> Generar Informe de Nota
+            </button>
+            <p class="text-xs text-gray-400">Requisitos: Teoría &ge; 7.00 | Físicas &ge; 15 pts y sin ceros.</p>
+        </div>
+
+        <!-- Modal de Resultado -->
+        <div id="resultModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+                <div class="bg-police text-white p-6 text-center">
+                    <h3 class="text-2xl font-bold uppercase tracking-widest">Resumen de Evaluación</h3>
+                </div>
+                <div id="modalBody" class="p-8">
+                    <!-- Contenido dinámico -->
+                </div>
+                <div class="p-4 bg-gray-50 flex justify-between border-t">
+                    <button onclick="closeModal()" class="bg-gray-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-gray-600 transition">Cerrar</button>
+                    <button onclick="window.print()" class="btn-police px-6 py-2 rounded-lg font-bold">
+                        <i class="fas fa-print mr-1"></i> Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="mt-12 text-center text-gray-500 text-sm">
+        <p class="font-bold">&copy; 2024 Academia Ángeles Custodios</p>
+        <p class="mt-1 italic">"Compromiso y excelencia en tu formación policial"</p>
+    </footer>
+
+    <script>
+        function calculateTheory() {
+            const hits = parseFloat(document.getElementById('theoryHits').value) || 0;
+            const misses = parseFloat(document.getElementById('theoryMisses').value) || 0;
+            
+            let finalTheory = (hits - (misses / 2)) / 10;
+            finalTheory = Math.max(0, finalTheory);
+            
+            const display = document.getElementById('theoryResult');
+            const badge = document.getElementById('theoryBadge');
+            display.innerText = finalTheory.toFixed(2);
+            
+            if (finalTheory >= 7) {
+                display.className = "text-2xl font-black text-green-600";
+                badge.innerText = "Apto (Corte 7.0)";
+                badge.className = "text-[10px] font-bold uppercase mt-1 text-green-600";
+            } else {
+                display.className = "text-2xl font-black text-red-600";
+                badge.innerText = "No Apto (Mín. 7.0)";
+                badge.className = "text-[10px] font-bold uppercase mt-1 text-red-600";
+            }
+            
+            return finalTheory;
+        }
+
+        function calculatePsy() {
+            const hits = parseFloat(document.getElementById('psyHits').value) || 0;
+            const misses = parseFloat(document.getElementById('psyMisses').value) || 0;
+            const n = parseInt(document.getElementById('psyOptions').value);
+            
+            let result = hits - (misses / (n - 1));
+            document.getElementById('psyResult').innerText = Math.max(0, result).toFixed(2);
+            return Math.max(0, result);
+        }
+
+        function calculatePhys() {
+            const p1 = parseFloat(document.getElementById('phys1').value) || 0;
+            const p2 = parseFloat(document.getElementById('phys2').value) || 0;
+            const p3 = parseFloat(document.getElementById('phys3').value) || 0;
+            
+            const total = p1 + p2 + p3;
+            const hasZero = (p1 === 0 || p2 === 0 || p3 === 0);
+            
+            const display = document.getElementById('physTotal');
+            const badge = document.getElementById('physBadge');
+            
+            display.innerText = total;
+            
+            if (total >= 15 && !hasZero) {
+                display.className = "text-3xl font-black text-green-600";
+                badge.innerText = "Apto";
+                badge.className = "text-[10px] font-bold uppercase mt-1 text-green-600";
+            } else {
+                display.className = "text-3xl font-black text-red-600";
+                badge.innerText = hasZero ? "No Apto (Cero detectado)" : "No Apto (Mín. 15 pts)";
+                badge.className = "text-[10px] font-bold uppercase mt-1 text-red-600";
+            }
+            
+            return { total, p1, p2, p3, isApto: (total >= 15 && !hasZero) };
+        }
+
+        function generateReport() {
+            const name = document.getElementById('studentName').value || "Opositor";
+            const id = document.getElementById('studentId').value || "N/A";
+            const theory = calculateTheory();
+            const psy = calculatePsy();
+            const phys = calculatePhys();
+
+            const isTheoryApto = theory >= 7;
+            const isPhysApto = phys.isApto;
+
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <div class="mb-6 text-center border-b pb-4">
+                    <img src="https://cursos.academiaangelescustodios.es/assets/img/logo.png" class="h-12 mx-auto mb-2" alt="Logo">
+                    <p class="text-xl font-bold text-police">${name}</p>
+                    <p class="text-gray-500 text-sm">DNI/ID: ${id}</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="p-4 rounded-xl border-2 ${isPhysApto ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50'}">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-xs font-bold text-gray-500 uppercase">Físicas (Mín. 15 pts)</span>
+                                <div class="text-sm text-gray-600">${phys.p1} + ${phys.p2} + ${phys.p3}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-black ${isPhysApto ? 'text-green-700' : 'text-red-700'}">${phys.total} pts</div>
+                                <div class="text-[10px] font-bold uppercase">${isPhysApto ? 'Apto' : 'No Apto'}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-xl border-2 ${isTheoryApto ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50'}">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-xs font-bold text-gray-500 uppercase">Teoría (Corte 7.00)</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-black ${isTheoryApto ? 'text-green-700' : 'text-red-700'}">${theory.toFixed(2)}</div>
+                                <div class="text-[10px] font-bold uppercase">${isTheoryApto ? 'Apto' : 'No Apto'}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-xl border-2 border-yellow-500 bg-yellow-50">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-yellow-800 uppercase">Psicotécnicos</span>
+                            <div class="text-right">
+                                <div class="text-2xl font-black text-yellow-800">${psy.toFixed(2)}</div>
+                                <div class="text-[10px] font-bold uppercase text-yellow-700">Ptos Netos</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center p-5 bg-police text-white rounded-2xl shadow-lg">
+                    <p class="text-xs opacity-70 uppercase tracking-widest mb-1">Dictamen de Simulación</p>
+                    <p class="text-3xl font-black ${isTheoryApto && isPhysApto ? 'text-yellow-400' : 'text-white'}">
+                        ${isTheoryApto && isPhysApto ? '¡APTO PARA ÁVILA!' : 'SIGUE TRABAJANDO'}
+                    </p>
+                    <p class="text-[10px] mt-2 opacity-60">"Academia Ángeles Custodios: Tu éxito es nuestro objetivo"</p>
+                </div>
+            `;
+
+            document.getElementById('resultModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').classList.add('hidden');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
